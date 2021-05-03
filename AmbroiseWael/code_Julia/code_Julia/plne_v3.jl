@@ -9,11 +9,11 @@ using Gurobi
 ##
 zone = "maroc"
 
-data_zone = open("RECHOP/SujetProjet20202021/instance/$zone.csv") do file
+data_zone = open("AmbroiseWael/instance/$zone.csv") do file
     readlines(file)
 end
 
-instance_zone = lire_instance("RECHOP/SujetProjet20202021/instance/$zone.csv")
+instance_zone = lire_instance("AmbroiseWael/SujetProjet20202021/instance/$zone.csv")
 
 
 
