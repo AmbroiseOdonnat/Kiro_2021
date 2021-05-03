@@ -2,7 +2,7 @@ include("import_all.jl")
 
 zone = "maroc"
 
-data_zone = open("/Users/ambroise/Projet/sujet/$zone.csv") do file
+data_zone = open(".../sujet/$zone.csv") do file
     readlines(file)
 end
 
