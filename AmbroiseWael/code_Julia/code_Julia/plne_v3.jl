@@ -13,7 +13,7 @@ data_zone = open("AmbroiseWael/instance/$zone.csv") do file
     readlines(file)
 end
 
-instance_zone = lire_instance("AmbroiseWael/SujetProjet20202021/instance/$zone.csv")
+instance_zone = lire_instance("AmbroiseWael/instance/$zone.csv")
 
 
 
