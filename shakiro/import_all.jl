@@ -1,5 +1,5 @@
 #include("instance.jl")
 #include("write.jl")
 include("solution.jl")
-include("Test_Ambroise.jl")
-Pkg.add("JSON")
+#Pkg.add("JSON")
+import JSON
