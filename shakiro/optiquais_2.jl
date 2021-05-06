@@ -1,6 +1,6 @@
 import JSON
 using Dates
-nom_instance= "A"
+nom_instance= "NS"
 
 groupes, itineraires, voies_quai, voies_ligne, interdictions, contraintes = lire_instance("C:\\Users\\Wael\\Desktop\\instances\\$nom_instance.json")
 
@@ -57,8 +57,7 @@ for f = 1:length(interdictions)
     end
 end
 
-Circ_interdit_quai["23"]
-Mat_interdit_quai["23"]
+
 
 
 function itineraire_possible(voie_ligne,voie_quai,sens)  #renvoie true s'il existe un itineraire entre le quai i et le quai j

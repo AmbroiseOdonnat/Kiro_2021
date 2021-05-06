@@ -107,26 +107,45 @@ quais = [old_solution[string(i-1)]["voieAQuai"] for i=1:nb_trains]
 itins = [old_solution[string(i-1)]["itineraire"] for i=1:nb_trains]
 
 
-for t=1:nb_trains
-    if quais[t]== "notAffected"
-        sensdep,l,q,type_circul,date_heure,materiel = caracteristique_train(t-1)
-        allowed = quais_autorises_train[t]
-
-        for quai in allowed
-            list_itin = itineraire_possible(l, quai, sensdep)
-            if length(list_itin)>=1
-                itins[t] = list_itin[1]-1
-                quais[t] = quai
-                break
-            else
-                itins[t] = "notAffected"
-                quais[t] = "notAffected"
-            end
+conflit_trains = []
+for t in 1:693
+    conflit_train = []
+    for c in contraintes
+        if c[1] == t
+            push!(conflit_train,[c[2],c[3],c[4]])
         end
     end
+    push!(conflit_trains,unique!(conflit_train))
 end
 
 
+conflit_trains
+
+
+
+function chevauchement(quais,itins)
+    for t in 1:nb_trains
+        if quais[t] != "notAffected"
+            sensdepart,l,q,type_circul,date_heure,materiel = caracteristique_train(t-1)
+            it = itins[t]
+            conflits = conflit_trains[t]
+            for conflit in conflits
+                if it == conflit[1]
+                    train = conflit[2]
+                    if itins[train] == conflit[3]
+                        potential_itins = itineraire_possible(l,voies_quai[t],sensdepart)
+                        if length(potential_itins) > 1
+                            itins[t] = potential_itins[2]
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return itins
+end
+
+itins = chevauchement(quais,itins)
 
 solution = Dict(string(i-1) => Dict("voieAQuai" => quais[i], "itineraire" => itins[i]) for i=1:nb_trains)
 
@@ -135,6 +154,6 @@ json_string = JSON.json(solution)
 
 
 
-open("shakiro\\solutions\\$(nom_instance)_deux.json","w") do f
+open("shakiro\\solutions\\$(nom_instance)_quatre.json","w") do f
   print(f, json_string)
 end
