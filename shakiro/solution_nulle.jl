@@ -1,6 +1,6 @@
 import JSON
 
-nom_instance= "PMP"
+nom_instance= "A"
 
 instance = JSON.parsefile("C:\\Users\\Wael\\Desktop\\instances\\$nom_instance.json")
 
@@ -22,7 +22,7 @@ end
 
 nb_trains = maximum(ids)+1
 
-solution = Dict(string(i) => Dict("voieAQuai" => "notAffected", "itineraire" => "notAffected") for i=1:nb_trains)
+solution = Dict(string(i-1) => Dict("voieAQuai" => "notAffected", "itineraire" => "notAffected") for i=1:nb_trains)
 
 
 json_string = JSON.json(solution)
