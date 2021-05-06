@@ -33,6 +33,7 @@ function caracteristique_itineraire(id)
     println("itinéraire non existant")
 end
 
+
 function number_trains()
     nb = 0
     for groupe in groupes
@@ -57,10 +58,6 @@ for f = 1:length(interdictions)
     end
 end
 
-Circ_interdit_quai["23"]
-Mat_interdit_quai["23"]
-
-
 function itineraire_possible(voie_ligne,voie_quai,sens)  #renvoie true s'il existe un itineraire entre le quai i et le quai j
     it_possible = []
     n = length(itineraires)
@@ -73,48 +70,4 @@ function itineraire_possible(voie_ligne,voie_quai,sens)  #renvoie true s'il exis
         end
     end
     return it_possible
-end
-
-
-
-quais = Vector{Any}(undef, nb_trains)
-lignes = Vector{Any}(undef, nb_trains)
-sens = Vector{Any}(undef, nb_trains)
-itins = Vector{Any}(undef, nb_trains)
-
-
-sensdep,l,q,type_circul,date_heure,materiel = caracteristique_train(25)
-print(materiel)
-
-materiel
-
-
-for i=1:nb_trains
-    sensdep,l,q,type_circul,date_heure,materiel = caracteristique_train(i-1)
-    quais[i] = q
-    lignes[i] = l
-    sens[i] = sensdep
-    if (type_circul in Circ_interdit_quai[q]) || length(intersect(materiel, Mat_interdit_quai[q]))>=1
-        itins[i] = "notAffected"
-        quais[i] = "notAffected"
-    else
-        list_itin = itineraire_possible(l,q,sensdep)
-        if length(list_itin)>=1
-            itins[i] = list_itin[1]-1
-        else
-            itins[i] = "notAffected"
-            quais[i] = "notAffected"
-        end
-    end
-end
-
-solution = Dict(string(i-1) => Dict("voieAQuai" => quais[i], "itineraire" => itins[i]) for i=1:nb_trains)
-
-
-json_string = JSON.json(solution)
-
-
-
-open("shakiro\\solutions\\$(nom_instance)_un.json","w") do f
-  print(f, json_string)
 end
