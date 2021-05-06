@@ -14,7 +14,7 @@ end
 
 groupes, itineraires, voies_quai, voies_ligne, interdictions, contraintes = lire_instance("C:\\Users\\Emma\\Desktop\\instances\\A.json")
 
-function nombre_trains()
+function nb_trains()
     nb = 0
     for groupe in groupes
         nb += length(groupe)
@@ -26,6 +26,7 @@ function nb_itineraire()
     return length(itineraires)
 end
 
+nb_itineraire()
 
 function caracteristique_train(id)
     for groupe in groupes
@@ -53,9 +54,10 @@ function caracteristique_itineraire(id)
             l = itineraire["voieEnLigne"]
             q = itineraire["voieAQuai"]
             return sensdep,l,q
-        end
+            exit
         end
     end
+    println("itinéraire non existant")
 end
 
-caracteristique_itineraire(15)
+caracteristique_itineraire(300000)
