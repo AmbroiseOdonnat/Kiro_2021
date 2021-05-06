@@ -7,49 +7,58 @@ using Gurobi
 
 
 ## Extraction Donnees
+##
+name = "NS"
+groupes, itineraires, voies_quai, voies_ligne, interdictions, contraintes = lire_instance("/Users/ambroise/instances/$name.json")
+T = nombre_trains()
+I = nb_itineraire()
+Q = length(voies_quai)
+J = length(contraintes)
 
-Val_q = #dictionnaire pour les quai et si jamais NonAffected, ça vaut 1
-C_not_affected = #recuperer le cout de non affectation
-C_incompatible = #recuperer cout incompatible
-delta_same_quai = #tableau avec 0 en entree si t et t' ont meme quai, 1 sinon
+trains = []
+for g in groupes
+    for t in g
+        push!(trains,t["id"])
+    end
+end
+sort!(trains)
+
+contraintes
+groupes
+##
+Val_q = Dict{String,Int}() #dictionnaire pour les quai et si jamais NonAffected, ça vaut 1
+Val_q["notAffected"] = 1
+for q in voies_quai
+    Val_q[q] = 0
+end
+
+Val_s = Dict{Bool,Int}(true=>1, false => 0) #dictionnaire pour les iti et si jamais NonAffected, ça vaut 1
+
+C_not_affected = 10000 #recuperer le cout de non affectation (pas la vraie valeur)
+C_incompatible = []
+for j in 1:J
+    push!(C_incompatible,contraintes[j][5])#recuperer cout incompatible
+end
+
 ## Maintenant on regarde si on arrive a faire tourner sur les autres
 
 model = Model(Gurobi.Optimizer)
 
-@variable(model, q_train[1:T],String) #nom de quai pour le train t
-@variable(model, q_iti[1:I],String) #nom de quai pour l'itineraire i_t'
+@variable(model, q_train[1:T],Int) #nom de quai pour le train t
+#@variable(model, itineraire_id[1:T],Dict) #nom de quai pour l'itineraire i_t'
 @variable(model, y_train[1:T],Int) #binaire 1 si non affecte pour q_t
 @variable(model, y_iti[1:J],Int) #binaire 1 si itineraire incompatible pour i_j
 
-cout_non_affected = @expression(model, sum(y_train[t]*C_non_affected)  for t = 1:T)
-cout_incompatible= @expression(model, sum(y_iti[j].C_incompatible[j]for j=1:J))
+cout_non_affected = @expression(model, sum(y_train[t]*C_not_affected  for t = 1:T))
+cout_incompatible= @expression(model, sum(y_iti[j]*C_incompatible[j] for j=1:J))
 
 
 @objective(model, Min, cout_non_affected + cout_incompatible )
 
-@constraint(model, binary_quai[t = 1:T], y_train[t] == Val_q[q_train[t]])
-@constraint(model, binary_iti[j = 1:J], y_iti[j] == Val_q[q_iti[j]])
-@constraint(model,coincide[t = 1:T], q_train[t] == q_iti[t.itineraire]] ) #je dois recuperer iti du train t
-@constraint(model, x_pos[e=1:E, u=1:U, f=1:F, j=1:J], x[e,u,f,j]>=0)
+#@constraint(model, binary_quai[t = 1:T], y_train[t] == Val_q[voies_quai[q_train[t]]])
+@constraint(model, binary_iti[j = 1:J], y_iti[j] == Val_s[contraintes[j][1] == contraintes[j][3] && contraintes[j][2] == contraintes[j][4]])
+#@constraint(model,coincide[t = 1:T], q_train[t] == itineraires.quai[q] ) #je dois recuperer iti du train t
 
-
-@constraint(model, sr_u_2[e = 1:E, u=1:U, j= 1:(J+1)], sr_plus_u[e,u,j] >= 0)
-@constraint(model, sr_f_2[e = 1:E, f=1:F, j= 1:(J+1)], sr_plus_f[e,f,j] >= 0)
-
-@constraint(model, bs_pos[e=1:E, f=:1:F,j=1:(J+1)], bs_plus[e,f,j] >= 0)
-
-@constraint(model, sr_u_1[e = 1:E, u=1:U, j= 1:J], sr_plus_u[e,u,j+1] >= s_u[e,u,j+1]-usines_zone[u].r[e,j])
-@constraint(model, sr_f_1[e = 1:E, f=1:F, j= 1:J], sr_plus_f[e,f,j+1] >= s_f[e,f,j+1]-fournisseurs_new[f].r[e,j])
-
-@constraint(model, route_u[e = 1:E, u = 1:U, j = 1:J], sum(x[e,u,f,j] for f in 1:F) == z_moins[e,u,j])
-@constraint(model, route_f[e = 1:E, f = 1:F, j = 1:J], sum(x[e,u,f,j] for u in 1:U) == z_plus[e,f,j])
-
-@constraint(model, stock_u[e=1:E,u=1:U, j=1:J], s_u[e,u,j+1] == s_u[e,u,j]+ usines_zone[u].b⁺[e,j] - z_moins[e,u,j])
-@constraint(model, stock_u_plus[e=1:E, u=1:U, j=1:(J+1)], s_u[e,u,j] >= 0)
-
-@constraint(model, stock_f[e = 1:E, f=1:F, j=1:J], s_f[e,f,j+1] == bs_plus[e,f,j]+z_plus[e,f,j] )
-
-@constraint(model, bs[e=1:E, f=:1:F,j=1:J], bs_plus[e,f,j+1]>=fournisseurs_new[f].b⁻[e,j]-s_f[e,f,j])
 
 optimize!(model)
 
@@ -58,8 +67,7 @@ optimize!(model)
 # cout seuil 250 -> 8 882 174
 # cout seuil 300 -> 9 105 513
 
-Optimal_livraison = value.(x)
-
+Optimal_quai = value.(q_train)
 termination_status(model)
 
 
