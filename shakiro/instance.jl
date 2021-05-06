@@ -1,29 +1,22 @@
 struct Instance
-    J::Int
-    U::Int
-    F::Int
-    E::Int
 
-    L::Int
-    γ::Int
-    ccam::Int
-    cstop::Int
+    trains::Vector{Trains}
+    itineraires::Vector{Itineraires}
+    voiesAQuai::Vector{VoiesAQuai}
+    voiesEnLigne::Vector{VoiesEnLigne}
+    interdictionsQuais::Vector{InterdictionsQuais}
+    contraintes::Vector{contraintes}
 
-    emballages::Vector{Emballage}
-    usines::Vector{Usine}
-    fournisseurs::Vector{Fournisseur}
-    graphe::Graphe
-
-    Instance(; J, U, F, E, L, γ, ccam, cstop, emballages, usines, fournisseurs, graphe) =
-        new(J, U, F, E, L, γ, ccam, cstop, emballages, usines, fournisseurs, graphe)
+    Instance(; trains, itineraires, voiesAQuai,voiesEnLigne,interdictionQuais,contraintes) =
+        new(trains, itineraires, voiesAQuai,voiesEnLigne,interdictionQuais,contraintes)
 end
 
 function Base.show(io::IO, instance::Instance)
     str = "\nInstance"
-    str *= "\n   Nombre de jours: $(instance.J)"
-    str *= "\n   Nombre d'usines: $(instance.U)"
-    str *= "\n   Nombre de fournisseurs: $(instance.F)"
-    str *= "\n   Nombre de types d'emballages: $(instance.E)"
+    str *= "\n   Nombre de trains: $(instance.trains)"
+    str *= "\n   Nombre d'itinéraires: $(instance.itineraires)"
+    str *= "\n   Nombre de voies à quai: $(instance.voiesAQuai)"
+    str *= "\n   Nombre de voies en ligne: $(instance.voiesEnLigne)"
     print(io, str)
 end
 
