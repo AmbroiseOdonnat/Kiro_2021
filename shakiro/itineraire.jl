@@ -14,5 +14,5 @@ function itineraire_possible(voie_ligne,voie_quai,sens)  #renvoie true s'il exis
     return it_possible
 end
 
-l = itineraire_possible("VU2_S","11",false)
+l = itineraire_possible("D4","11",true)
 print(l)

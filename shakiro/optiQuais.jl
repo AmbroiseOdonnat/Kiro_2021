@@ -1,8 +1,8 @@
 import JSON
 using Dates
-nom_instance= "PMP"
+name= "A"
 
-groupes, itineraires, voies_quai, voies_ligne, interdictions, contraintes = lire_instance("C:\\Users\\Wael\\Desktop\\instances\\$nom_instance.json")
+groupes, itineraires, voies_quai, voies_ligne, interdictions, contraintes = lire_instance("/Users/ambroise/instances/$name.json")
 
 
 nb_trains = nombre_trains()
@@ -39,3 +39,5 @@ for i=1:nb_trains
         itins[i] = -1
     end
 end
+
+include("chevauchement_Ambroise.jl")
