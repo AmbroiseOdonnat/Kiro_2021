@@ -1,12 +1,8 @@
 import JSON
 using Dates
-<<<<<<< HEAD
-name= "A"
-=======
-nom_instance= "A"
->>>>>>> 242c13dea161acfd245ef73609a9de0f243ef2b4
+nom_instance= "NS"
 
-groupes, itineraires, voies_quai, voies_ligne, interdictions, contraintes = lire_instance("/Users/ambroise/instances/$name.json")
+groupes, itineraires, voies_quai, voies_ligne, interdictions, contraintes = lire_instance("C:\\Users\\Wael\\Desktop\\instances\\$nom_instance.json")
 
 function caracteristique_train(id)
     for groupe in groupes
@@ -47,10 +43,21 @@ end
 
 nb_trains = number_trains()
 
-quais = Vector{Any}(undef, nb_trains)
-lignes = Vector{Any}(undef, nb_trains)
-sens = Vector{Any}(undef, nb_trains)
-itins = Vector{Any}(undef, nb_trains)
+Circ_interdit_quai = Dict(quai => [] for quai in voies_quai)
+Mat_interdit_quai = Dict(quai => [] for quai in voies_quai)
+
+
+
+for f = 1:length(interdictions)
+    forbid = interdictions[f]
+    my_quais = forbid["voiesAQuaiInterdites"]
+    for quai in my_quais
+        append!(Circ_interdit_quai[quai], forbid["typesCirculation"])
+        append!(Mat_interdit_quai[quai], forbid["typesMateriels"])
+    end
+end
+
+
 
 
 function itineraire_possible(voie_ligne,voie_quai,sens)  #renvoie true s'il existe un itineraire entre le quai i et le quai j
@@ -68,27 +75,37 @@ function itineraire_possible(voie_ligne,voie_quai,sens)  #renvoie true s'il exis
 end
 
 
+
+quais = Vector{Any}(undef, nb_trains)
+lignes = Vector{Any}(undef, nb_trains)
+sens = Vector{Any}(undef, nb_trains)
+itins = Vector{Any}(undef, nb_trains)
+
+
+sensdep,l,q,type_circul,date_heure,materiel = caracteristique_train(25)
+print(materiel)
+
+materiel
+
+
 for i=1:nb_trains
     sensdep,l,q,type_circul,date_heure,materiel = caracteristique_train(i-1)
     quais[i] = q
     lignes[i] = l
     sens[i] = sensdep
-
-    list_itin = itineraire_possible(l,q,sensdep)
-
-
-
-    if length(list_itin)>=1
-        itins[i] = list_itin[1]-1
-    else
+    if (type_circul in Circ_interdit_quai[q]) || length(intersect(materiel, Mat_interdit_quai[q]))>=1
         itins[i] = "notAffected"
         quais[i] = "notAffected"
+    else
+        list_itin = itineraire_possible(l,q,sensdep)
+        if length(list_itin)>=1
+            itins[i] = list_itin[1]-1
+        else
+            itins[i] = "notAffected"
+            quais[i] = "notAffected"
+        end
     end
 end
-
-<<<<<<< HEAD
-include("chevauchement_Ambroise.jl")
-=======
 
 solution = Dict(string(i-1) => Dict("voieAQuai" => quais[i], "itineraire" => itins[i]) for i=1:nb_trains)
 
@@ -97,7 +114,6 @@ json_string = JSON.json(solution)
 
 
 
-open("shakiro\\solutions\\$(nom_instance)_zero.json","w") do f
+open("shakiro\\solutions\\$(nom_instance)_un.json","w") do f
   print(f, json_string)
 end
->>>>>>> 242c13dea161acfd245ef73609a9de0f243ef2b4
